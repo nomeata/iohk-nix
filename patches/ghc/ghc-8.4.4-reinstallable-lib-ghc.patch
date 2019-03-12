@@ -1,0 +1,1117 @@
+diff --git a/boot b/boot
+index 7dc2983fea..7bf21962b6 100755
+--- a/boot
++++ b/boot
+@@ -113,12 +113,13 @@ def boot_pkgs():
+         elif len(cabals) == 1:
+             cabal = cabals[0]
+ 
+-            if os.path.isfile(cabal):
++            ghc_mk = os.path.join(package, 'ghc.mk')
++
++            if os.path.isfile(cabal) and not os.path.isfile(ghc_mk):
+                 # strip both .cabal and .in
+                 pkg = os.path.splitext(os.path.splitext(os.path.basename(cabal))[0])[0]
+                 top = package
+ 
+-                ghc_mk = os.path.join(package, 'ghc.mk')
+                 print('Creating %s' % ghc_mk)
+                 with open(ghc_mk, 'w') as f:
+                     f.write(dedent(
+diff --git a/compiler/cmm/Bitmap.hs b/compiler/cmm/Bitmap.hs
+index 6ff61933ee..a432c5829c 100644
+--- a/compiler/cmm/Bitmap.hs
++++ b/compiler/cmm/Bitmap.hs
+@@ -16,7 +16,7 @@ module Bitmap (
+   ) where
+ 
+ #include "HsVersions.h"
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ import GhcPrelude
+ 
+diff --git a/compiler/cmm/SMRep.hs b/compiler/cmm/SMRep.hs
+index 1469ae1bd3..c8ae5c081b 100644
+--- a/compiler/cmm/SMRep.hs
++++ b/compiler/cmm/SMRep.hs
+@@ -47,8 +47,8 @@ module SMRep (
+         pprWord8String, stringToWord8s
+     ) where
+ 
+-#include "../HsVersions.h"
+-#include "../includes/MachDeps.h"
++#include "HsVersions.h"
++#include "MachDeps.h"
+ 
+ import GhcPrelude
+ 
+@@ -424,8 +424,8 @@ cardTableSizeW dflags elems =
+ -----------------------------------------------------------------------------
+ -- deriving the RTS closure type from an SMRep
+ 
+-#include "../includes/rts/storage/ClosureTypes.h"
+-#include "../includes/rts/storage/FunTypes.h"
++#include "rts/storage/ClosureTypes.h"
++#include "rts/storage/FunTypes.h"
+ -- Defines CONSTR, CONSTR_1_0 etc
+ 
+ -- | Derives the RTS closure type from an 'SMRep'
+diff --git a/compiler/codeGen/CodeGen/Platform/ARM.hs b/compiler/codeGen/CodeGen/Platform/ARM.hs
+index a2cb476e04..f1ea5032a2 100644
+--- a/compiler/codeGen/CodeGen/Platform/ARM.hs
++++ b/compiler/codeGen/CodeGen/Platform/ARM.hs
+@@ -6,5 +6,5 @@ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_arm 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/ARM64.hs b/compiler/codeGen/CodeGen/Platform/ARM64.hs
+index 6ace181356..7a25fb8d40 100644
+--- a/compiler/codeGen/CodeGen/Platform/ARM64.hs
++++ b/compiler/codeGen/CodeGen/Platform/ARM64.hs
+@@ -6,5 +6,5 @@ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_aarch64 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/NoRegs.hs b/compiler/codeGen/CodeGen/Platform/NoRegs.hs
+index 4c074ee313..4a34c7804c 100644
+--- a/compiler/codeGen/CodeGen/Platform/NoRegs.hs
++++ b/compiler/codeGen/CodeGen/Platform/NoRegs.hs
+@@ -5,5 +5,5 @@ module CodeGen.Platform.NoRegs where
+ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/PPC.hs b/compiler/codeGen/CodeGen/Platform/PPC.hs
+index f7eae6b4ca..7dd458799f 100644
+--- a/compiler/codeGen/CodeGen/Platform/PPC.hs
++++ b/compiler/codeGen/CodeGen/Platform/PPC.hs
+@@ -6,5 +6,5 @@ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_powerpc 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/PPC_Darwin.hs b/compiler/codeGen/CodeGen/Platform/PPC_Darwin.hs
+index 91923fd453..b0eb097468 100644
+--- a/compiler/codeGen/CodeGen/Platform/PPC_Darwin.hs
++++ b/compiler/codeGen/CodeGen/Platform/PPC_Darwin.hs
+@@ -7,5 +7,5 @@ import GhcPrelude
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_powerpc 1
+ #define MACHREGS_darwin 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/SPARC.hs b/compiler/codeGen/CodeGen/Platform/SPARC.hs
+index 5d8dbb1da9..2eeb55c53d 100644
+--- a/compiler/codeGen/CodeGen/Platform/SPARC.hs
++++ b/compiler/codeGen/CodeGen/Platform/SPARC.hs
+@@ -6,5 +6,5 @@ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_sparc 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/X86.hs b/compiler/codeGen/CodeGen/Platform/X86.hs
+index 84d52c1585..fc3e384238 100644
+--- a/compiler/codeGen/CodeGen/Platform/X86.hs
++++ b/compiler/codeGen/CodeGen/Platform/X86.hs
+@@ -6,5 +6,5 @@ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_i386 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/CodeGen/Platform/X86_64.hs b/compiler/codeGen/CodeGen/Platform/X86_64.hs
+index 1b2b5549ac..0a26a1f8c1 100644
+--- a/compiler/codeGen/CodeGen/Platform/X86_64.hs
++++ b/compiler/codeGen/CodeGen/Platform/X86_64.hs
+@@ -6,5 +6,5 @@ import GhcPrelude
+ 
+ #define MACHREGS_NO_REGS 0
+ #define MACHREGS_x86_64 1
+-#include "../../../../includes/CodeGen.Platform.hs"
++#include "CodeGen.Platform.hs"
+ 
+diff --git a/compiler/codeGen/StgCmmClosure.hs b/compiler/codeGen/StgCmmClosure.hs
+index 2501ec9cbd..6c80c6eb3a 100644
+--- a/compiler/codeGen/StgCmmClosure.hs
++++ b/compiler/codeGen/StgCmmClosure.hs
+@@ -62,7 +62,7 @@ module StgCmmClosure (
+         staticClosureNeedsLink,
+     ) where
+ 
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ #include "HsVersions.h"
+ 
+diff --git a/compiler/codeGen/StgCmmLayout.hs b/compiler/codeGen/StgCmmLayout.hs
+index a0a64e5f2a..37a1075748 100644
+--- a/compiler/codeGen/StgCmmLayout.hs
++++ b/compiler/codeGen/StgCmmLayout.hs
+@@ -527,7 +527,7 @@ mkVirtConstrSizes dflags field_reps
+ -------------------------------------------------------------------------
+ 
+ -- bring in ARG_P, ARG_N, etc.
+-#include "../includes/rts/storage/FunTypes.h"
++#include "rts/storage/FunTypes.h"
+ 
+ mkArgDescr :: DynFlags -> [Id] -> ArgDescr
+ mkArgDescr dflags args
+diff --git a/compiler/ghc.cabal.in b/compiler/ghc.cabal.in
+index 9205648846..7d872c94b9 100644
+--- a/compiler/ghc.cabal.in
++++ b/compiler/ghc.cabal.in
+@@ -20,26 +20,17 @@ Category: Development
+ Build-Type: Simple
+ Cabal-Version: >=1.10
+ 
++extra-source-files:
++    utils/md5.h
++    Unique.h
++    nativeGen/NCG.h
++    parser/cutils.h
++
+ Flag ghci
+     Description: Build GHCi support.
+     Default: False
+     Manual: True
+ 
+-Flag stage1
+-    Description: Is this stage 1?
+-    Default: False
+-    Manual: True
+-
+-Flag stage2
+-    Description: Is this stage 2?
+-    Default: False
+-    Manual: True
+-
+-Flag stage3
+-    Description: Is this stage 3?
+-    Default: False
+-    Manual: True
+-
+ Flag terminfo
+     Description: Build GHC with terminfo support on non-Windows platforms.
+     Default: True
+@@ -118,17 +109,6 @@ Library
+     -- as it's magic.
+     GHC-Options: -this-unit-id ghc
+ 
+-    if flag(stage1)
+-        Include-Dirs: stage1
+-    else
+-        if flag(stage2)
+-            Include-Dirs: stage2
+-        else
+-            if flag(stage3)
+-                Include-Dirs: stage2
+-
+-    Install-Includes: HsVersions.h, ghc_boot_platform.h
+-
+     c-sources:
+         parser/cutils.c
+         ghci/keepCAFsForGHCi.c
+diff --git a/compiler/ghc.mk b/compiler/ghc.mk
+index 9bc6b3f278..f460f8f091 100644
+--- a/compiler/ghc.mk
++++ b/compiler/ghc.mk
+@@ -30,9 +30,7 @@ compiler_stage1_C_FILES_NODEPS = compiler/parser/cutils.c
+ compiler_NO_CHECK = YES
+ 
+ ifneq "$(BINDIST)" "YES"
+-compiler/stage1/package-data.mk : compiler/stage1/build/Config.hs
+-compiler/stage2/package-data.mk : compiler/stage2/build/Config.hs
+-compiler/stage3/package-data.mk : compiler/stage3/build/Config.hs
++compiler/main/Config.hs : rts/build/config.hs-incl
+ 
+ compiler/stage1/build/PlatformConstants.o: $(includes_GHCCONSTANTS_HASKELL_TYPE)
+ compiler/stage2/build/PlatformConstants.o: $(includes_GHCCONSTANTS_HASKELL_TYPE)
+@@ -45,276 +43,6 @@ compiler/stage2/build/DynFlags.o: $(includes_GHCCONSTANTS_HASKELL_WRAPPERS)
+ compiler/stage3/build/DynFlags.o: $(includes_GHCCONSTANTS_HASKELL_WRAPPERS)
+ endif
+ 
+-compiler/stage%/build/Config.hs : mk/config.mk mk/project.mk | $$(dir $$@)/.
+-	$(call removeFiles,$@)
+-	@echo 'Creating $@ ... '
+-	@echo '{-# LANGUAGE CPP #-}'                                        >> $@
+-	@echo 'module Config where'                                         >> $@
+-	@echo                                                               >> $@
+-	@echo 'import GhcPrelude'                                           >> $@
+-	@echo                                                               >> $@
+-	@echo '#include "ghc_boot_platform.h"'                              >> $@
+-	@echo                                                               >> $@
+-	@echo 'data IntegerLibrary = IntegerGMP'                            >> $@
+-	@echo '                    | IntegerSimple'                         >> $@
+-	@echo '                    deriving Eq'                             >> $@
+-	@echo                                                               >> $@
+-	@echo 'cBuildPlatformString :: String'                              >> $@
+-	@echo 'cBuildPlatformString = BuildPlatform_NAME'                   >> $@
+-	@echo 'cHostPlatformString :: String'                               >> $@
+-	@echo 'cHostPlatformString = HostPlatform_NAME'                     >> $@
+-	@echo 'cTargetPlatformString :: String'                             >> $@
+-	@echo 'cTargetPlatformString = TargetPlatform_NAME'                 >> $@
+-	@echo                                                               >> $@
+-	@echo 'cProjectName          :: String'                             >> $@
+-	@echo 'cProjectName          = "$(ProjectName)"'                    >> $@
+-	@echo 'cProjectGitCommitId   :: String'				    >> $@
+-	@echo 'cProjectGitCommitId   = "$(ProjectGitCommitId)"'		    >> $@
+-	@echo 'cProjectVersion       :: String'                             >> $@
+-	@echo 'cProjectVersion       = "$(ProjectVersion)"'                 >> $@
+-	@echo 'cProjectVersionInt    :: String'                             >> $@
+-	@echo 'cProjectVersionInt    = "$(ProjectVersionInt)"'              >> $@
+-	@echo 'cProjectPatchLevel    :: String'                             >> $@
+-	@echo 'cProjectPatchLevel    = "$(ProjectPatchLevel)"'              >> $@
+-	@echo 'cProjectPatchLevel1   :: String'                             >> $@
+-	@echo 'cProjectPatchLevel1   = "$(ProjectPatchLevel1)"'             >> $@
+-	@echo 'cProjectPatchLevel2   :: String'                             >> $@
+-	@echo 'cProjectPatchLevel2   = "$(ProjectPatchLevel2)"'             >> $@
+-	@echo 'cBooterVersion        :: String'                             >> $@
+-	@echo 'cBooterVersion        = "$(GhcVersion)"'                     >> $@
+-	@echo 'cStage                :: String'                             >> $@
+-	@echo 'cStage                = show (STAGE :: Int)'                 >> $@
+-	@echo 'cIntegerLibrary       :: String'                             >> $@
+-	@echo 'cIntegerLibrary       = "$(INTEGER_LIBRARY)"'                >> $@
+-	@echo 'cIntegerLibraryType   :: IntegerLibrary'                     >> $@
+-ifeq "$(INTEGER_LIBRARY)" "integer-gmp"
+-	@echo 'cIntegerLibraryType   = IntegerGMP'                          >> $@
+-else ifeq "$(INTEGER_LIBRARY)" "integer-simple"
+-	@echo 'cIntegerLibraryType   = IntegerSimple'                       >> $@
+-else ifneq "$(CLEANING)" "YES"
+-$(error Unknown integer library)
+-endif
+-	@echo 'cSupportsSplitObjs    :: String'                             >> $@
+-	@echo 'cSupportsSplitObjs    = "$(SupportsSplitObjs)"'              >> $@
+-	@echo 'cGhcWithInterpreter   :: String'                             >> $@
+-	@echo 'cGhcWithInterpreter   = "$(GhcWithInterpreter)"'             >> $@
+-	@echo 'cGhcWithNativeCodeGen :: String'                             >> $@
+-	@echo 'cGhcWithNativeCodeGen = "$(GhcWithNativeCodeGen)"'           >> $@
+-	@echo 'cGhcWithSMP           :: String'                             >> $@
+-	@echo 'cGhcWithSMP           = "$(GhcWithSMP)"'                     >> $@
+-	@echo 'cGhcRTSWays           :: String'                             >> $@
+-	@echo 'cGhcRTSWays           = "$(GhcRTSWays)"'                     >> $@
+-	@echo 'cGhcRtsWithLibdw      :: Bool'                               >> $@
+-ifeq "$(GhcRtsWithLibdw)" "YES"
+-	@echo 'cGhcRtsWithLibdw      = True'                                >> $@
+-else
+-	@echo 'cGhcRtsWithLibdw      = False'                               >> $@
+-endif
+-	@echo 'cGhcEnableTablesNextToCode :: String'                        >> $@
+-	@echo 'cGhcEnableTablesNextToCode = "$(GhcEnableTablesNextToCode)"' >> $@
+-	@echo 'cLeadingUnderscore    :: String'                             >> $@
+-	@echo 'cLeadingUnderscore    = "$(LeadingUnderscore)"'              >> $@
+-	@echo 'cGHC_UNLIT_PGM        :: String'                             >> $@
+-	@echo 'cGHC_UNLIT_PGM        = "$(utils/unlit_dist_PROG)"'          >> $@
+-	@echo 'cGHC_SPLIT_PGM        :: String'                             >> $@
+-	@echo 'cGHC_SPLIT_PGM        = "$(driver/split_dist_PROG)"'         >> $@
+-	@echo 'cLibFFI               :: Bool'                               >> $@
+-ifeq "$(UseLibFFIForAdjustors)" "YES"
+-	@echo 'cLibFFI               = True'                                >> $@
+-else
+-	@echo 'cLibFFI               = False'                               >> $@
+-endif
+-# Note that GhcThreaded just reflects the Makefile variable setting.
+-# In particular, the stage1 compiler is never actually compiled with
+-# -threaded, but it will nevertheless have cGhcThreaded = True.
+-# The "+RTS --info" output will show what RTS GHC is really using.
+-	@echo 'cGhcThreaded :: Bool'                                        >> $@
+-ifeq "$(GhcThreaded)" "YES"
+-	@echo 'cGhcThreaded = True'                                         >> $@
+-else
+-	@echo 'cGhcThreaded = False'                                        >> $@
+-endif
+-	@echo 'cGhcDebugged :: Bool'                                        >> $@
+-ifeq "$(GhcDebugged)" "YES"
+-	@echo 'cGhcDebugged = True'                                         >> $@
+-else
+-	@echo 'cGhcDebugged = False'                                        >> $@
+-endif
+-	@echo done.
+-
+-# -----------------------------------------------------------------------------
+-# Create platform includes
+-
+-# Here we generate a little header file containing CPP symbols that GHC
+-# uses to determine which platform it is building on/for.  The platforms
+-# can differ between stage1 and stage2 if we're cross-compiling, so we
+-# need one of these header files per stage.
+-
+-PLATFORM_H = ghc_boot_platform.h
+-
+-compiler/stage1/$(PLATFORM_H) : mk/config.mk mk/project.mk | $$(dir $$@)/.
+-	$(call removeFiles,$@)
+-	@echo "Creating $@..."
+-	@echo "#ifndef __PLATFORM_H__"                           >> $@
+-	@echo "#define __PLATFORM_H__"                           >> $@
+-	@echo                                                    >> $@
+-	@echo "#define BuildPlatform_NAME  \"$(BUILDPLATFORM)\""  >> $@
+-	@echo "#define HostPlatform_NAME   \"$(HOSTPLATFORM)\""   >> $@
+-	@echo "#define TargetPlatform_NAME \"$(TARGETPLATFORM)\"" >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(BuildPlatform_CPP)_BUILD 1"              >> $@
+-	@echo "#define $(HostPlatform_CPP)_HOST 1"                >> $@
+-	@echo "#define $(TargetPlatform_CPP)_TARGET 1"            >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(BuildArch_CPP)_BUILD_ARCH 1"             >> $@
+-	@echo "#define $(HostArch_CPP)_HOST_ARCH 1"               >> $@
+-	@echo "#define $(TargetArch_CPP)_TARGET_ARCH 1"           >> $@
+-	@echo "#define BUILD_ARCH \"$(BuildArch_CPP)\""           >> $@
+-	@echo "#define HOST_ARCH \"$(HostArch_CPP)\""             >> $@
+-	@echo "#define TARGET_ARCH \"$(TargetArch_CPP)\""         >> $@
+-	@echo "#define LLVM_TARGET \"$(LLVMTarget_CPP)\""         >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(BuildOS_CPP)_BUILD_OS 1"                 >> $@
+-	@echo "#define $(HostOS_CPP)_HOST_OS 1"                   >> $@
+-	@echo "#define $(TargetOS_CPP)_TARGET_OS 1"               >> $@
+-	@echo "#define BUILD_OS \"$(BuildOS_CPP)\""               >> $@
+-	@echo "#define HOST_OS \"$(HostOS_CPP)\""                 >> $@
+-	@echo "#define TARGET_OS \"$(TargetOS_CPP)\""             >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(BuildVendor_CPP)_BUILD_VENDOR 1"         >> $@
+-	@echo "#define $(HostVendor_CPP)_HOST_VENDOR 1"           >> $@
+-	@echo "#define $(TargetVendor_CPP)_TARGET_VENDOR  1"      >> $@
+-	@echo "#define BUILD_VENDOR \"$(BuildVendor_CPP)\""       >> $@
+-	@echo "#define HOST_VENDOR \"$(HostVendor_CPP)\""         >> $@
+-	@echo "#define TARGET_VENDOR \"$(TargetVendor_CPP)\""     >> $@
+-	@echo                                                     >> $@
+-	@echo "#endif /* __PLATFORM_H__ */"                       >> $@
+-	@echo "Done."
+-
+-# For stage2 and above, the BUILD platform is the HOST of stage1, and
+-# the HOST platform is the TARGET of stage1.  The TARGET remains the same
+-# (stage1 is the cross-compiler, not stage2).
+-compiler/stage2/$(PLATFORM_H) : mk/config.mk mk/project.mk | $$(dir $$@)/.
+-	$(call removeFiles,$@)
+-	@echo "Creating $@..."
+-	@echo "#ifndef __PLATFORM_H__"                            >> $@
+-	@echo "#define __PLATFORM_H__"                            >> $@
+-	@echo                                                     >> $@
+-	@echo "#define BuildPlatform_NAME  \"$(HOSTPLATFORM)\""   >> $@
+-	@echo "#define HostPlatform_NAME   \"$(TARGETPLATFORM)\"" >> $@
+-	@echo "#define TargetPlatform_NAME \"$(TARGETPLATFORM)\"" >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(HostPlatform_CPP)_BUILD 1"               >> $@
+-	@echo "#define $(TargetPlatform_CPP)_HOST 1"              >> $@
+-	@echo "#define $(TargetPlatform_CPP)_TARGET 1"            >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(HostArch_CPP)_BUILD_ARCH 1"              >> $@
+-	@echo "#define $(TargetArch_CPP)_HOST_ARCH 1"             >> $@
+-	@echo "#define $(TargetArch_CPP)_TARGET_ARCH 1"           >> $@
+-	@echo "#define BUILD_ARCH \"$(HostArch_CPP)\""            >> $@
+-	@echo "#define HOST_ARCH \"$(TargetArch_CPP)\""           >> $@
+-	@echo "#define TARGET_ARCH \"$(TargetArch_CPP)\""         >> $@
+-	@echo "#define LLVM_TARGET \"$(LLVMTarget_CPP)\""         >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(HostOS_CPP)_BUILD_OS 1"                  >> $@
+-	@echo "#define $(TargetOS_CPP)_HOST_OS 1"                 >> $@
+-	@echo "#define $(TargetOS_CPP)_TARGET_OS 1"               >> $@
+-	@echo "#define BUILD_OS \"$(HostOS_CPP)\""                >> $@
+-	@echo "#define HOST_OS \"$(TargetOS_CPP)\""               >> $@
+-	@echo "#define TARGET_OS \"$(TargetOS_CPP)\""             >> $@
+-	@echo                                                     >> $@
+-	@echo "#define $(HostVendor_CPP)_BUILD_VENDOR 1"          >> $@
+-	@echo "#define $(TargetVendor_CPP)_HOST_VENDOR 1"         >> $@
+-	@echo "#define $(TargetVendor_CPP)_TARGET_VENDOR  1"      >> $@
+-	@echo "#define BUILD_VENDOR \"$(HostVendor_CPP)\""        >> $@
+-	@echo "#define HOST_VENDOR \"$(TargetVendor_CPP)\""       >> $@
+-	@echo "#define TARGET_VENDOR \"$(TargetVendor_CPP)\""     >> $@
+-	@echo                                                     >> $@
+-	@echo "#endif /* __PLATFORM_H__ */"                       >> $@
+-	@echo "Done."
+-
+-compiler/stage3/$(PLATFORM_H) : compiler/stage2/$(PLATFORM_H)
+-	"$(CP)" $< $@
+-
+-# ----------------------------------------------------------------------------
+-#		Generate supporting stuff for prelude/PrimOp.hs
+-#		from prelude/primops.txt
+-
+-PRIMOP_BITS_NAMES = primop-data-decl.hs-incl        \
+-                    primop-tag.hs-incl              \
+-                    primop-list.hs-incl             \
+-                    primop-has-side-effects.hs-incl \
+-                    primop-out-of-line.hs-incl      \
+-                    primop-commutable.hs-incl       \
+-                    primop-code-size.hs-incl        \
+-                    primop-can-fail.hs-incl         \
+-                    primop-strictness.hs-incl       \
+-                    primop-fixity.hs-incl           \
+-                    primop-primop-info.hs-incl      \
+-                    primop-vector-uniques.hs-incl   \
+-                    primop-vector-tys.hs-incl       \
+-                    primop-vector-tys-exports.hs-incl \
+-                    primop-vector-tycons.hs-incl
+-
+-PRIMOP_BITS_STAGE1 = $(addprefix compiler/stage1/build/,$(PRIMOP_BITS_NAMES))
+-PRIMOP_BITS_STAGE2 = $(addprefix compiler/stage2/build/,$(PRIMOP_BITS_NAMES))
+-PRIMOP_BITS_STAGE3 = $(addprefix compiler/stage3/build/,$(PRIMOP_BITS_NAMES))
+-
+-compiler_CPP_OPTS += $(addprefix -I,$(GHC_INCLUDE_DIRS))
+-compiler_CPP_OPTS += ${GhcCppOpts}
+-
+-# We add these paths to the Haskell compiler's #include search path list since
+-# we must avoid #including files by paths relative to the source file as Hadrian
+-# moves the build artifacts out of the source tree. See #8040.
+-compiler_HC_OPTS += $(addprefix -I,$(GHC_INCLUDE_DIRS))
+-
+-define preprocessCompilerFiles
+-# $0 = stage
+-compiler/stage$1/build/primops.txt: compiler/prelude/primops.txt.pp compiler/stage$1/$$(PLATFORM_H)
+-	$$(HS_CPP) -P $$(compiler_CPP_OPTS) -Icompiler/stage$1 -x c $$< | grep -v '^#pragma GCC' > $$@
+-
+-compiler/stage$1/build/primop-data-decl.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --data-decl          < $$< > $$@
+-compiler/stage$1/build/primop-tag.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-tag         < $$< > $$@
+-compiler/stage$1/build/primop-list.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-list        < $$< > $$@
+-compiler/stage$1/build/primop-has-side-effects.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --has-side-effects   < $$< > $$@
+-compiler/stage$1/build/primop-out-of-line.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --out-of-line        < $$< > $$@
+-compiler/stage$1/build/primop-commutable.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --commutable         < $$< > $$@
+-compiler/stage$1/build/primop-code-size.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --code-size          < $$< > $$@
+-compiler/stage$1/build/primop-can-fail.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --can-fail           < $$< > $$@
+-compiler/stage$1/build/primop-strictness.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --strictness         < $$< > $$@
+-compiler/stage$1/build/primop-fixity.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --fixity             < $$< > $$@
+-compiler/stage$1/build/primop-primop-info.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-primop-info < $$< > $$@
+-compiler/stage$1/build/primop-vector-uniques.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-vector-uniques     < $$< > $$@
+-compiler/stage$1/build/primop-vector-tys.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-vector-tys         < $$< > $$@
+-compiler/stage$1/build/primop-vector-tys-exports.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-vector-tys-exports < $$< > $$@
+-compiler/stage$1/build/primop-vector-tycons.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --primop-vector-tycons      < $$< > $$@
+-
+-# Usages aren't used any more; but the generator
+-# can still generate them if we want them back
+-compiler/stage$1/build/primop-usage.hs-incl: compiler/stage$1/build/primops.txt $$$$(genprimopcode_INPLACE)
+-	"$$(genprimopcode_INPLACE)" --usage              < $$< > $$@
+-
+-endef
+-
+-$(eval $(call preprocessCompilerFiles,1))
+-$(eval $(call preprocessCompilerFiles,2))
+-$(eval $(call preprocessCompilerFiles,3))
+-
+ # -----------------------------------------------------------------------------
+ # Configuration
+ 
+@@ -487,10 +215,6 @@ ifneq "$(BINDIST)" "YES"
+ compiler_stage2_TAGS_HC_OPTS = -package ghc
+ $(eval $(call tags-package,compiler,stage2))
+ 
+-$(compiler_stage1_depfile_haskell) : compiler/stage1/$(PLATFORM_H)
+-$(compiler_stage2_depfile_haskell) : compiler/stage2/$(PLATFORM_H)
+-$(compiler_stage3_depfile_haskell) : compiler/stage3/$(PLATFORM_H)
+-
+ COMPILER_INCLUDES_DEPS += $(includes_H_CONFIG)
+ COMPILER_INCLUDES_DEPS += $(includes_H_PLATFORM)
+ COMPILER_INCLUDES_DEPS += $(includes_GHCCONSTANTS)
+@@ -499,9 +223,13 @@ COMPILER_INCLUDES_DEPS += $(includes_GHCCONSTANTS_HASKELL_WRAPPERS)
+ COMPILER_INCLUDES_DEPS += $(includes_GHCCONSTANTS_HASKELL_EXPORTS)
+ COMPILER_INCLUDES_DEPS += $(includes_DERIVEDCONSTANTS)
+ 
+-$(compiler_stage1_depfile_haskell) : $(COMPILER_INCLUDES_DEPS) $(PRIMOP_BITS_STAGE1)
+-$(compiler_stage2_depfile_haskell) : $(COMPILER_INCLUDES_DEPS) $(PRIMOP_BITS_STAGE2)
+-$(compiler_stage3_depfile_haskell) : $(COMPILER_INCLUDES_DEPS) $(PRIMOP_BITS_STAGE3)
++$(compiler_stage1_depfile_haskell) : $(COMPILER_INCLUDES_DEPS) $(PRIMOP_BITS_STAGE1) libraries/ghc-prim/dist-boot/ghc_boot_platform.h
++$(compiler_stage2_depfile_haskell) : $(COMPILER_INCLUDES_DEPS) $(PRIMOP_BITS_STAGE2) libraries/ghc-prim/dist-install/ghc_boot_platform.h
++$(compiler_stage3_depfile_haskell) : $(COMPILER_INCLUDES_DEPS) $(PRIMOP_BITS_STAGE3) libraries/ghc-prim/dist-install/ghc_boot_platform.h
++
++compiler_stage1_HC_OPTS += -Ilibraries/ghc-prim/dist-boot -Irts/build
++compiler_stage2_HC_OPTS += -Ilibraries/ghc-prim/dist-install -Irts/build
++compiler_stage3_HC_OPTS += -Ilibraries/ghc-prim/dist-install -Irts/build
+ 
+ $(foreach way,$(compiler_stage1_WAYS),\
+       compiler/stage1/build/PrimOp.$($(way)_osuf)) : $(PRIMOP_BITS_STAGE1)
+diff --git a/compiler/ghci/ByteCodeInstr.hs b/compiler/ghci/ByteCodeInstr.hs
+index 07dcd2222a..cc440330bc 100644
+--- a/compiler/ghci/ByteCodeInstr.hs
++++ b/compiler/ghci/ByteCodeInstr.hs
+@@ -10,7 +10,7 @@ module ByteCodeInstr (
+   ) where
+ 
+ #include "HsVersions.h"
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ import GhcPrelude
+ 
+diff --git a/compiler/main/Config.hs b/compiler/main/Config.hs
+new file mode 100644
+index 0000000000..f944f7aa07
+--- /dev/null
++++ b/compiler/main/Config.hs
+@@ -0,0 +1,7 @@
++{-# LANGUAGE CPP #-}
++module Config where
++
++import GhcPrelude
++
++#include "ghc_boot_platform.h"
++#include "config.hs-incl"
+\ No newline at end of file
+diff --git a/compiler/nativeGen/PPC/CodeGen.hs b/compiler/nativeGen/PPC/CodeGen.hs
+index e2c568c836..b0aca64a6a 100644
+--- a/compiler/nativeGen/PPC/CodeGen.hs
++++ b/compiler/nativeGen/PPC/CodeGen.hs
+@@ -22,7 +22,7 @@ where
+ 
+ #include "HsVersions.h"
+ #include "nativeGen/NCG.h"
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ -- NCG stuff:
+ import GhcPrelude
+diff --git a/compiler/nativeGen/SPARC/CodeGen.hs b/compiler/nativeGen/SPARC/CodeGen.hs
+index 6dfd58950e..9d089efb30 100644
+--- a/compiler/nativeGen/SPARC/CodeGen.hs
++++ b/compiler/nativeGen/SPARC/CodeGen.hs
+@@ -19,7 +19,7 @@ where
+ 
+ #include "HsVersions.h"
+ #include "nativeGen/NCG.h"
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ -- NCG stuff:
+ import GhcPrelude
+diff --git a/compiler/nativeGen/X86/CodeGen.hs b/compiler/nativeGen/X86/CodeGen.hs
+index eb6af1ff41..d8af5def27 100644
+--- a/compiler/nativeGen/X86/CodeGen.hs
++++ b/compiler/nativeGen/X86/CodeGen.hs
+@@ -27,7 +27,7 @@ where
+ 
+ #include "HsVersions.h"
+ #include "nativeGen/NCG.h"
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ -- NCG stuff:
+ import GhcPrelude
+diff --git a/compiler/prelude/PrelRules.hs b/compiler/prelude/PrelRules.hs
+index 7bc61337da..0e560f3930 100644
+--- a/compiler/prelude/PrelRules.hs
++++ b/compiler/prelude/PrelRules.hs
+@@ -23,7 +23,7 @@ module PrelRules
+ where
+ 
+ #include "HsVersions.h"
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ import GhcPrelude
+ 
+diff --git a/compiler/utils/Binary.hs b/compiler/utils/Binary.hs
+index c3c8ae3ab7..32fb8f587a 100644
+--- a/compiler/utils/Binary.hs
++++ b/compiler/utils/Binary.hs
+@@ -58,7 +58,7 @@ module Binary
+ #include "HsVersions.h"
+ 
+ -- The *host* architecture version:
+-#include "../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ import GhcPrelude
+ 
+diff --git a/ghc.mk b/ghc.mk
+index 38c165d261..7cb7913f50 100644
+--- a/ghc.mk
++++ b/ghc.mk
+@@ -593,26 +593,6 @@ BOOT_LIBS = $(foreach lib,$(PACKAGES_STAGE0),$(libraries/$(lib)_dist-boot_v_LIB)
+ # Only build internal interpreter support for the stage2 ghci lib
+ libraries/ghci_dist-install_CONFIGURE_OPTS += --flags=ghci
+ 
+-# ----------------------------------------
+-# Special magic for the ghc-prim package
+-
+-# We want the ghc-prim package to include the GHC.Prim module when it
+-# is registered, but not when it is built, because GHC.Prim is not a
+-# real source module, it is built-in to GHC.
+-
+-# Strip it out again before building the package:
+-define libraries/ghc-prim_PACKAGE_MAGIC
+-libraries/ghc-prim_dist-install_MODULES := $$(filter-out GHC.Prim,$$(libraries/ghc-prim_dist-install_MODULES))
+-endef
+-
+-PRIMOPS_TXT_STAGE1 = compiler/stage1/build/primops.txt
+-
+-libraries/ghc-prim/dist-install/build/GHC/PrimopWrappers.hs : $$(genprimopcode_INPLACE) $(PRIMOPS_TXT_STAGE1) | $$(dir $$@)/.
+-	"$(genprimopcode_INPLACE)" --make-haskell-wrappers < $(PRIMOPS_TXT_STAGE1) >$@
+-
+-# Required so that Haddock documents the primops.
+-libraries/ghc-prim_dist-install_EXTRA_HADDOCK_SRCS = libraries/ghc-prim/dist-install/build/autogen/GHC/Prim.hs
+-
+ # ----------------------------------------
+ # Special magic for the integer package
+ 
+diff --git a/ghc/ghc.mk b/ghc/ghc.mk
+index 20fa142df5..ad4b7c2c4c 100644
+--- a/ghc/ghc.mk
++++ b/ghc/ghc.mk
+@@ -14,10 +14,6 @@ ghc_USES_CABAL = YES
+ ghc_PACKAGE = ghc-bin
+ ghc_EXECUTABLE = ghc
+ 
+-ghc_stage1_CONFIGURE_OPTS += --flags=stage1
+-ghc_stage2_CONFIGURE_OPTS += --flags=stage2
+-ghc_stage3_CONFIGURE_OPTS += --flags=stage3
+-
+ ifeq "$(GhcWithInterpreter)" "YES"
+ ghc_stage2_CONFIGURE_OPTS += --flags=ghci
+ ghc_stage3_CONFIGURE_OPTS += --flags=ghci
+@@ -121,9 +117,9 @@ ghc/stage2/build/tmp/$(ghc_stage2_PROG) : $(foreach lib,$(PACKAGES_STAGE1),$(lib
+ endif
+ 
+ # Modules here import HsVersions.h, so we need ghc_boot_platform.h
+-$(ghc_stage1_depfile_haskell) : compiler/stage1/$(PLATFORM_H)
+-$(ghc_stage2_depfile_haskell) : compiler/stage2/$(PLATFORM_H)
+-$(ghc_stage3_depfile_haskell) : compiler/stage3/$(PLATFORM_H)
++$(ghc_stage1_depfile_haskell) : libraries/ghc-prim/dist-boot/$(PLATFORM_H)
++$(ghc_stage2_depfile_haskell) : libraries/ghc-prim/dist-install/$(PLATFORM_H)
++$(ghc_stage3_depfile_haskell) : libraries/ghc-prim/dist-install/$(PLATFORM_H)
+ 
+ all_ghc_stage1 : $(GHC_STAGE1)
+ all_ghc_stage2 : $(GHC_STAGE2)
+@@ -173,6 +169,12 @@ endif
+ INSTALL_LIBS += settings
+ INSTALL_LIBS += llvm-targets
+ 
++# A rather nasty hack needed because we still have headers in
++# ghc-prim and rts.
++ghc_stage1_HC_OPTS += -Irts/build -Ilibraries/ghc-prim/dist-boot
++ghc_stage2_HC_OPTS += -Irts/build -Ilibraries/ghc-prim/dist-install
++ghc_stage3_HC_OPTS += -Irts/build -Ilibraries/ghc-prim/dist-install
++
+ ifeq "$(Windows_Host)" "NO"
+ install: install_ghc_link
+ .PHONY: install_ghc_link
+diff --git a/includes/ghc.mk b/includes/ghc.mk
+index d08ecfbc07..93589508ef 100644
+--- a/includes/ghc.mk
++++ b/includes/ghc.mk
+@@ -229,4 +229,6 @@ install_includes :
+ 	    $(INSTALL_HEADER) $(INSTALL_OPTS) includes/$d/*.h "$(DESTDIR)$(ghcheaderdir)/$d/" && \
+ 	) true
+ 	$(INSTALL_HEADER) $(INSTALL_OPTS) $(includes_H_CONFIG) $(includes_H_PLATFORM) $(includes_H_VERSION) $(includes_DERIVEDCONSTANTS) "$(DESTDIR)$(ghcheaderdir)/"
++	$(INSTALL_HEADER) rts/build/*.h rts/build/*.hs-incl includes/CodeGen.Platform.hs "$(DESTDIR)$(ghcheaderdir)/"
++	$(INSTALL_HEADER) $(includes_GHCCONSTANTS_HASKELL_TYPE) $(includes_GHCCONSTANTS_HASKELL_VALUE) $(includes_GHCCONSTANTS_HASKELL_WRAPPERS) $(includes_GHCCONSTANTS_HASKELL_EXPORTS) "$(DESTDIR)$(ghcheaderdir)/"
+ 
+diff --git a/libraries/ghc-prim/ghc-prim.cabal b/libraries/ghc-prim/ghc-prim.cabal
+index f395c9faac..099ebeb833 100644
+--- a/libraries/ghc-prim/ghc-prim.cabal
++++ b/libraries/ghc-prim/ghc-prim.cabal
+@@ -12,6 +12,16 @@ build-type:     Custom
+ description:
+     This package contains the primitive types and operations supplied by GHC.
+ 
++Flag boot
++    Description: Is this stage 1?
++    Default: False
++    Manual: True
++
++Flag install
++    Description: Is this stage 2?
++    Default: True
++    Manual: True
++
+ extra-source-files: changelog.md
+ 
+ source-repository head
+@@ -81,3 +91,27 @@ Library
+     -- We need to set the unit ID to ghc-prim (without a version number)
+     -- as it's magic.
+     ghc-options: -this-unit-id ghc-prim
++
++    if flag(boot)
++      include-dirs: dist-boot
++    else
++      if flag(install)
++        include-dirs: dist-install
++
++    install-includes:
++        ghc_boot_platform.h
++        primop-data-decl.hs-incl
++        primop-tag.hs-incl
++        primop-list.hs-incl
++        primop-has-side-effects.hs-incl
++        primop-out-of-line.hs-incl
++        primop-commutable.hs-incl
++        primop-code-size.hs-incl
++        primop-can-fail.hs-incl
++        primop-strictness.hs-incl
++        primop-fixity.hs-incl
++        primop-primop-info.hs-incl
++        primop-vector-uniques.hs-incl
++        primop-vector-tys.hs-incl
++        primop-vector-tys-exports.hs-incl
++        primop-vector-tycons.hs-incl
+\ No newline at end of file
+diff --git a/libraries/ghc-prim/ghc.mk b/libraries/ghc-prim/ghc.mk
+index d08ecfbc07..5b0947897e 100644
+--- a/libraries/ghc-prim/ghc.mk
++++ b/libraries/ghc-prim/ghc.mk
+@@ -1,5 +1,202 @@
+ libraries/ghc-prim_PACKAGE = ghc-prim
+ libraries/ghc-prim_dist-install_GROUP = libraries
++
++libraries/ghc-prim_stage1_CONFIGURE_OPTS += --flags=boot
++libraries/ghc-prim_stage2_CONFIGURE_OPTS += --flags=install
++libraries/ghc-prim_stage3_CONFIGURE_OPTS += --flags=install
++
++
++# ----------------------------------------
++# Special magic for the ghc-prim package
++
++# We want the ghc-prim package to include the GHC.Prim module when it
++# is registered, but not when it is built, because GHC.Prim is not a
++# real source module, it is built-in to GHC.
++
++# Strip it out again before building the package:
++define libraries/ghc-prim_PACKAGE_MAGIC
++libraries/ghc-prim_dist-install_MODULES := $$(filter-out GHC.Prim,$$(libraries/ghc-prim_dist-install_MODULES))
++endef
++
++PRIMOPS_TXT_STAGE1 = libraries/ghc-prim/dist-boot/primops.txt
++
++libraries/ghc-prim/dist-install/build/GHC/PrimopWrappers.hs : $$(genprimopcode_INPLACE) $(PRIMOPS_TXT_STAGE1) | $$(dir $$@)/.
++	"$(genprimopcode_INPLACE)" --make-haskell-wrappers < $(PRIMOPS_TXT_STAGE1) >$@
++
++# Required so that Haddock documents the primops.
++libraries/ghc-prim_dist-install_EXTRA_HADDOCK_SRCS = libraries/ghc-prim/dist-install/build/autogen/GHC/Prim.hs
++
++
++# -----------------------------------------------------------------------------
++# Create platform includes
++
++# Here we generate a little header file containing CPP symbols that GHC
++# uses to determine which platform it is building on/for.  The platforms
++# can differ between stage1 and stage2 if we're cross-compiling, so we
++# need one of these header files per stage.
++
++PLATFORM_H = ghc_boot_platform.h
++
++libraries/ghc-prim/dist-boot/$(PLATFORM_H) : mk/config.mk mk/project.mk | $$(dir $$@)/.
++	$(call removeFiles,$@)
++	@echo "Creating $@..."
++	@echo "#ifndef __PLATFORM_H__"                           >> $@
++	@echo "#define __PLATFORM_H__"                           >> $@
++	@echo                                                    >> $@
++	@echo "#define BuildPlatform_NAME  \"$(BUILDPLATFORM)\""  >> $@
++	@echo "#define HostPlatform_NAME   \"$(HOSTPLATFORM)\""   >> $@
++	@echo "#define TargetPlatform_NAME \"$(TARGETPLATFORM)\"" >> $@
++	@echo                                                     >> $@
++	@echo "#define $(BuildPlatform_CPP)_BUILD 1"              >> $@
++	@echo "#define $(HostPlatform_CPP)_HOST 1"                >> $@
++	@echo "#define $(TargetPlatform_CPP)_TARGET 1"            >> $@
++	@echo                                                     >> $@
++	@echo "#define $(BuildArch_CPP)_BUILD_ARCH 1"             >> $@
++	@echo "#define $(HostArch_CPP)_HOST_ARCH 1"               >> $@
++	@echo "#define $(TargetArch_CPP)_TARGET_ARCH 1"           >> $@
++	@echo "#define BUILD_ARCH \"$(BuildArch_CPP)\""           >> $@
++	@echo "#define HOST_ARCH \"$(HostArch_CPP)\""             >> $@
++	@echo "#define TARGET_ARCH \"$(TargetArch_CPP)\""         >> $@
++	@echo "#define LLVM_TARGET \"$(LLVMTarget_CPP)\""         >> $@
++	@echo                                                     >> $@
++	@echo "#define $(BuildOS_CPP)_BUILD_OS 1"                 >> $@
++	@echo "#define $(HostOS_CPP)_HOST_OS 1"                   >> $@
++	@echo "#define $(TargetOS_CPP)_TARGET_OS 1"               >> $@
++	@echo "#define BUILD_OS \"$(BuildOS_CPP)\""               >> $@
++	@echo "#define HOST_OS \"$(HostOS_CPP)\""                 >> $@
++	@echo "#define TARGET_OS \"$(TargetOS_CPP)\""             >> $@
++	@echo                                                     >> $@
++	@echo "#define $(BuildVendor_CPP)_BUILD_VENDOR 1"         >> $@
++	@echo "#define $(HostVendor_CPP)_HOST_VENDOR 1"           >> $@
++	@echo "#define $(TargetVendor_CPP)_TARGET_VENDOR  1"      >> $@
++	@echo "#define BUILD_VENDOR \"$(BuildVendor_CPP)\""       >> $@
++	@echo "#define HOST_VENDOR \"$(HostVendor_CPP)\""         >> $@
++	@echo "#define TARGET_VENDOR \"$(TargetVendor_CPP)\""     >> $@
++	@echo                                                     >> $@
++	@echo "#endif /* __PLATFORM_H__ */"                       >> $@
++	@echo "Done."
++
++# For stage2 and above, the BUILD platform is the HOST of stage1, and
++# the HOST platform is the TARGET of stage1.  The TARGET remains the same
++# (stage1 is the cross-compiler, not stage2).
++libraries/ghc-prim/dist-install/$(PLATFORM_H) : mk/config.mk mk/project.mk | $$(dir $$@)/.
++	$(call removeFiles,$@)
++	@echo "Creating $@..."
++	@echo "#ifndef __PLATFORM_H__"                            >> $@
++	@echo "#define __PLATFORM_H__"                            >> $@
++	@echo                                                     >> $@
++	@echo "#define BuildPlatform_NAME  \"$(HOSTPLATFORM)\""   >> $@
++	@echo "#define HostPlatform_NAME   \"$(TARGETPLATFORM)\"" >> $@
++	@echo "#define TargetPlatform_NAME \"$(TARGETPLATFORM)\"" >> $@
++	@echo                                                     >> $@
++	@echo "#define $(HostPlatform_CPP)_BUILD 1"               >> $@
++	@echo "#define $(TargetPlatform_CPP)_HOST 1"              >> $@
++	@echo "#define $(TargetPlatform_CPP)_TARGET 1"            >> $@
++	@echo                                                     >> $@
++	@echo "#define $(HostArch_CPP)_BUILD_ARCH 1"              >> $@
++	@echo "#define $(TargetArch_CPP)_HOST_ARCH 1"             >> $@
++	@echo "#define $(TargetArch_CPP)_TARGET_ARCH 1"           >> $@
++	@echo "#define BUILD_ARCH \"$(HostArch_CPP)\""            >> $@
++	@echo "#define HOST_ARCH \"$(TargetArch_CPP)\""           >> $@
++	@echo "#define TARGET_ARCH \"$(TargetArch_CPP)\""         >> $@
++	@echo "#define LLVM_TARGET \"$(LLVMTarget_CPP)\""         >> $@
++	@echo                                                     >> $@
++	@echo "#define $(HostOS_CPP)_BUILD_OS 1"                  >> $@
++	@echo "#define $(TargetOS_CPP)_HOST_OS 1"                 >> $@
++	@echo "#define $(TargetOS_CPP)_TARGET_OS 1"               >> $@
++	@echo "#define BUILD_OS \"$(HostOS_CPP)\""                >> $@
++	@echo "#define HOST_OS \"$(TargetOS_CPP)\""               >> $@
++	@echo "#define TARGET_OS \"$(TargetOS_CPP)\""             >> $@
++	@echo                                                     >> $@
++	@echo "#define $(HostVendor_CPP)_BUILD_VENDOR 1"          >> $@
++	@echo "#define $(TargetVendor_CPP)_HOST_VENDOR 1"         >> $@
++	@echo "#define $(TargetVendor_CPP)_TARGET_VENDOR  1"      >> $@
++	@echo "#define BUILD_VENDOR \"$(HostVendor_CPP)\""        >> $@
++	@echo "#define HOST_VENDOR \"$(TargetVendor_CPP)\""       >> $@
++	@echo "#define TARGET_VENDOR \"$(TargetVendor_CPP)\""     >> $@
++	@echo                                                     >> $@
++	@echo "#endif /* __PLATFORM_H__ */"                       >> $@
++	@echo "Done."
++
++# ----------------------------------------------------------------------------
++#              Generate supporting stuff for prelude/PrimOp.hs
++#              from prelude/primops.txt
++
++PRIMOP_BITS_NAMES = primop-data-decl.hs-incl        \
++                    primop-tag.hs-incl              \
++                    primop-list.hs-incl             \
++                    primop-has-side-effects.hs-incl \
++                    primop-out-of-line.hs-incl      \
++                    primop-commutable.hs-incl       \
++                    primop-code-size.hs-incl        \
++                    primop-can-fail.hs-incl         \
++                    primop-strictness.hs-incl       \
++                    primop-fixity.hs-incl           \
++                    primop-primop-info.hs-incl      \
++                    primop-vector-uniques.hs-incl   \
++                    primop-vector-tys.hs-incl       \
++                    primop-vector-tys-exports.hs-incl \
++                    primop-vector-tycons.hs-incl
++
++PRIMOP_BITS_STAGE1 = $(addprefix libraries/ghc-prim/dist-boot/,$(PRIMOP_BITS_NAMES))
++PRIMOP_BITS_STAGE2 = $(addprefix libraries/ghc-prim/dist-install/,$(PRIMOP_BITS_NAMES))
++PRIMOP_BITS_STAGE3 = $(addprefix libraries/ghc-prim/dist-install/,$(PRIMOP_BITS_NAMES))
++
++compiler_CPP_OPTS += $(addprefix -I,$(GHC_INCLUDE_DIRS))
++compiler_CPP_OPTS += ${GhcCppOpts}
++
++# We add these paths to the Haskell compiler's #include search path list since
++# we must avoid #including files by paths relative to the source file as Hadrian
++# moves the build artifacts out of the source tree. See #8040.
++compiler_HC_OPTS += $(addprefix -I,$(GHC_INCLUDE_DIRS))
++
++define preprocessCompilerFiles
++# $0 = stage
++libraries/ghc-prim/$1/primops.txt: libraries/ghc-prim/primops.txt.pp libraries/ghc-prim/$1/$$(PLATFORM_H)
++	$$(HS_CPP) -P $$(compiler_CPP_OPTS) -Ilibraries/ghc-prim/$1 -x c $$< | grep -v '^#pragma GCC' > $$@
++
++libraries/ghc-prim/$1/primop-data-decl.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --data-decl          < $$< > $$@
++libraries/ghc-prim/$1/primop-tag.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-tag         < $$< > $$@
++libraries/ghc-prim/$1/primop-list.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-list        < $$< > $$@
++libraries/ghc-prim/$1/primop-has-side-effects.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --has-side-effects   < $$< > $$@
++libraries/ghc-prim/$1/primop-out-of-line.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --out-of-line        < $$< > $$@
++libraries/ghc-prim/$1/primop-commutable.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --commutable         < $$< > $$@
++libraries/ghc-prim/$1/primop-code-size.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --code-size          < $$< > $$@
++libraries/ghc-prim/$1/primop-can-fail.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --can-fail           < $$< > $$@
++libraries/ghc-prim/$1/primop-strictness.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --strictness         < $$< > $$@
++libraries/ghc-prim/$1/primop-fixity.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --fixity             < $$< > $$@
++libraries/ghc-prim/$1/primop-primop-info.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-primop-info < $$< > $$@
++libraries/ghc-prim/$1/primop-vector-uniques.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-vector-uniques     < $$< > $$@
++libraries/ghc-prim/$1/primop-vector-tys.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-vector-tys         < $$< > $$@
++libraries/ghc-prim/$1/primop-vector-tys-exports.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-vector-tys-exports < $$< > $$@
++libraries/ghc-prim/$1/primop-vector-tycons.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --primop-vector-tycons      < $$< > $$@
++
++# Usages aren't used any more; but the generator
++# can still generate them if we want them back
++libraries/ghc-prim/$1/primop-usage.hs-incl: libraries/ghc-prim/$1/primops.txt $$$$(genprimopcode_INPLACE)
++	"$$(genprimopcode_INPLACE)" --usage              < $$< > $$@
++
++endef
++
++$(eval $(call preprocessCompilerFiles,dist-boot))
++$(eval $(call preprocessCompilerFiles,dist-install))
++
++
+ $(if $(filter ghc-prim,$(PACKAGES_STAGE0)),$(eval $(call build-package,libraries/ghc-prim,dist-boot,0)))
+ $(if $(filter ghc-prim,$(PACKAGES_STAGE1)),$(eval $(call build-package,libraries/ghc-prim,dist-install,1)))
+ $(if $(filter ghc-prim,$(PACKAGES_STAGE2)),$(eval $(call build-package,libraries/ghc-prim,dist-install,2)))
+diff --git a/compiler/prelude/primops.txt.pp b/libraries/ghc-prim/primops.txt.pp
+similarity index 100%
+rename from compiler/prelude/primops.txt.pp
+rename to libraries/ghc-prim/primops.txt.pp
+diff --git a/compiler/HsVersions.h b/rts/build/HsVersions.h
+similarity index 100%
+rename from compiler/HsVersions.h
+rename to rts/build/HsVersions.h
+diff --git a/rts/ghc.mk b/rts/ghc.mk
+index 761cc43b8f..457d394909 100644
+--- a/rts/ghc.mk
++++ b/rts/ghc.mk
+@@ -34,6 +34,95 @@ rts_dist_WAYS = $(rts_WAYS)
+ ALL_RTS_LIBS = $(foreach way,$(rts_WAYS),rts/dist/build/libHSrts$($(way)_libsuf))
+ $(eval $(call all-target,rts,$(ALL_RTS_LIBS)))
+ 
++
++rts/build/config.hs-incl : mk/config.mk mk/project.mk | $$(dir $$@)/.
++	$(call removeFiles,$@)
++	@echo 'Creating $@ ... '
++	@echo 'data IntegerLibrary = IntegerGMP'                            >> $@
++	@echo '                    | IntegerSimple'                         >> $@
++	@echo '                    deriving Eq'                             >> $@
++	@echo                                                               >> $@
++	@echo 'cBuildPlatformString :: String'                              >> $@
++	@echo 'cBuildPlatformString = BuildPlatform_NAME'                   >> $@
++	@echo 'cHostPlatformString :: String'                               >> $@
++	@echo 'cHostPlatformString = HostPlatform_NAME'                     >> $@
++	@echo 'cTargetPlatformString :: String'                             >> $@
++	@echo 'cTargetPlatformString = TargetPlatform_NAME'                 >> $@
++	@echo                                                               >> $@
++	@echo 'cProjectName          :: String'                             >> $@
++	@echo 'cProjectName          = "$(ProjectName)"'                    >> $@
++	@echo 'cProjectGitCommitId   :: String'				    >> $@
++	@echo 'cProjectGitCommitId   = "$(ProjectGitCommitId)"'		    >> $@
++	@echo 'cProjectVersion       :: String'                             >> $@
++	@echo 'cProjectVersion       = "$(ProjectVersion)"'                 >> $@
++	@echo 'cProjectVersionInt    :: String'                             >> $@
++	@echo 'cProjectVersionInt    = "$(ProjectVersionInt)"'              >> $@
++	@echo 'cProjectPatchLevel    :: String'                             >> $@
++	@echo 'cProjectPatchLevel    = "$(ProjectPatchLevel)"'              >> $@
++	@echo 'cProjectPatchLevel1   :: String'                             >> $@
++	@echo 'cProjectPatchLevel1   = "$(ProjectPatchLevel1)"'             >> $@
++	@echo 'cProjectPatchLevel2   :: String'                             >> $@
++	@echo 'cProjectPatchLevel2   = "$(ProjectPatchLevel2)"'             >> $@
++	@echo 'cBooterVersion        :: String'                             >> $@
++	@echo 'cBooterVersion        = "$(GhcVersion)"'                     >> $@
++	@echo 'cStage                :: String'                             >> $@
++	@echo 'cStage                = show (STAGE :: Int)'                 >> $@
++	@echo 'cIntegerLibraryType   :: IntegerLibrary'                     >> $@
++ifeq "$(INTEGER_LIBRARY)" "integer-gmp"
++	@echo 'cIntegerLibraryType   = IntegerGMP'                          >> $@
++else ifeq "$(INTEGER_LIBRARY)" "integer-simple"
++	@echo 'cIntegerLibraryType   = IntegerSimple'                       >> $@
++else ifneq "$(CLEANING)" "YES"
++$(error Unknown integer library)
++endif
++	@echo 'cSupportsSplitObjs    :: String'                             >> $@
++	@echo 'cSupportsSplitObjs    = "$(SupportsSplitObjs)"'              >> $@
++	@echo 'cGhcWithInterpreter   :: String'                             >> $@
++	@echo 'cGhcWithInterpreter   = "$(GhcWithInterpreter)"'             >> $@
++	@echo 'cGhcWithNativeCodeGen :: String'                             >> $@
++	@echo 'cGhcWithNativeCodeGen = "$(GhcWithNativeCodeGen)"'           >> $@
++	@echo 'cGhcWithSMP           :: String'                             >> $@
++	@echo 'cGhcWithSMP           = "$(GhcWithSMP)"'                     >> $@
++	@echo 'cGhcRTSWays           :: String'                             >> $@
++	@echo 'cGhcRTSWays           = "$(GhcRTSWays)"'                     >> $@
++	@echo 'cGhcRtsWithLibdw      :: Bool'                               >> $@
++ifeq "$(GhcRtsWithLibdw)" "YES"
++	@echo 'cGhcRtsWithLibdw      = True'                                >> $@
++else
++	@echo 'cGhcRtsWithLibdw      = False'                               >> $@
++endif
++	@echo 'cGhcEnableTablesNextToCode :: String'                        >> $@
++	@echo 'cGhcEnableTablesNextToCode = "$(GhcEnableTablesNextToCode)"' >> $@
++	@echo 'cLeadingUnderscore    :: String'                             >> $@
++	@echo 'cLeadingUnderscore    = "$(LeadingUnderscore)"'              >> $@
++	@echo 'cGHC_UNLIT_PGM        :: String'                             >> $@
++	@echo 'cGHC_UNLIT_PGM        = "$(utils/unlit_dist_PROG)"'          >> $@
++	@echo 'cGHC_SPLIT_PGM        :: String'                             >> $@
++	@echo 'cGHC_SPLIT_PGM        = "$(driver/split_dist_PROG)"'         >> $@
++	@echo 'cLibFFI               :: Bool'                               >> $@
++ifeq "$(UseLibFFIForAdjustors)" "YES"
++	@echo 'cLibFFI               = True'                                >> $@
++else
++	@echo 'cLibFFI               = False'                               >> $@
++endif
++# Note that GhcThreaded just reflects the Makefile variable setting.
++# In particular, the stage1 compiler is never actually compiled with
++# -threaded, but it will nevertheless have cGhcThreaded = True.
++# The "+RTS --info" output will show what RTS GHC is really using.
++	@echo 'cGhcThreaded :: Bool'                                        >> $@
++ifeq "$(GhcThreaded)" "YES"
++	@echo 'cGhcThreaded = True'                                         >> $@
++else
++	@echo 'cGhcThreaded = False'                                        >> $@
++endif
++	@echo 'cGhcDebugged :: Bool'                                        >> $@
++ifeq "$(GhcDebugged)" "YES"
++	@echo 'cGhcDebugged = True'                                         >> $@
++else
++	@echo 'cGhcDebugged = False'                                        >> $@
++endif
++	@echo done.
++
+ # -----------------------------------------------------------------------------
+ # Defining the sources
+ 
+diff --git a/rts/rts.cabal.in b/rts/rts.cabal.in
+index 664a8f119a..717a5a17cc 100644
+--- a/rts/rts.cabal.in
++++ b/rts/rts.cabal.in
+@@ -80,6 +80,11 @@ library
+                       ghcautoconf.h ghcconfig.h ghcplatform.h ghcversion.h
+                       -- ^ from ../includes
+                       DerivedConstants.h ffi.h ffitarget.h
++                      GHCConstantsHaskellType.hs GHCConstantsHaskellWrappers.hs
++                      CodeGen.Platform.hs
++                      platformConstants
++                      config.hs-incl
++                      HsVersions.h
+                       -- ^ generated
+                       rts/Adjustor.h
+                       rts/BlockSignals.h
+diff --git a/utils/genapply/Main.hs b/utils/genapply/Main.hs
+index b30c9f8c46..150c8c80c8 100644
+--- a/utils/genapply/Main.hs
++++ b/utils/genapply/Main.hs
+@@ -17,7 +17,7 @@ module Main(main) where
+ #include "../../includes/rts/Constants.h"
+ 
+ -- Needed for TAG_BITS
+-#include "../../includes/MachDeps.h"
++#include "MachDeps.h"
+ 
+ #if MIN_VERSION_base(4,11,0)
+ import Prelude hiding ((<>))

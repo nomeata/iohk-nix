@@ -32,6 +32,7 @@ in {
    libiserv     = ./ghc-packages/libiserv-8.4.4.nix;
    remote-iserv = ./ghc-packages/remote-iserv-8.4.4.nix;
    iserv-proxy  = ./ghc-packages/iserv-proxy-8.4.4.nix;
+   ghc          = ./ghc-packages/ghc-8.4.4.nix;
   };
   ghc861 = h: ghc86 h // {
     ghci         = ./ghc-packages/ghci-8.6.1.nix;
