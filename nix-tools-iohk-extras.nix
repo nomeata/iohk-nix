@@ -49,6 +49,7 @@ in {
     iserv-proxy  = ./ghc-packages/iserv-proxy-8.6.2.nix;
   };
   ghc863 = h: ghc86 h // {
+    ghc          = ./ghc-packages/ghc-8.6.3.nix;
     ghci         = ./ghc-packages/ghci-8.6.3.nix;
     ghc-boot     = ./ghc-packages/ghc-boot-8.6.3.nix;
     libiserv     = ./ghc-packages/libiserv-8.6.3.nix;
