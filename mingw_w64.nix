@@ -13,34 +13,35 @@
 , extra-test-libs ? []
 }:
 let
-  ################################################################################
-  # Build logic (TH support via remote iserv via wine)
-  #
-  setupBuildFlags = map (opt: "--ghc-option=" + opt) [
-    "-fexternal-interpreter"
-    "-pgmi" "${iserv-proxy}/bin/iserv-proxy"
-    "-opti" "127.0.0.1" "-opti" "$PORT"
-    # TODO: this should be automatically injected based on the extraLibrary.
-    "-L${mingw_w64_pthreads}/lib"
-    "-L${mingw_w64_pthreads}/bin"
-    "-L${gmp}/lib"
-  ];
-  preBuild = ''
+
+  wineIservWrapper = writeScriptBin "iserv-wrapper" ''
+    #!${stdenv.shell}
+    set -euo pipefail
     # unset the configureFlags.
     # configure should have run already
     # without restting it, wine might fail
     # due to a too large environment.
     unset configureFlags
     PORT=$((5000 + $RANDOM % 5000))
-    echo "---> Starting remote-iserv on port $PORT"
+    (>&2 echo "---> Starting remote-iserv on port $PORT")
     WINEDLLOVERRIDES="winemac.drv=d" WINEDEBUG=-all+error WINEPREFIX=$TMP ${wine}/bin/wine64 ${remote-iserv}/bin/remote-iserv.exe tmp $PORT &
-    echo "---| remote-iserv should have started on $PORT"
-    RISERV_PID=$!
-  '';
-  postBuild = ''
-    echo "---> killing remote-iserv..."
+    (>&2 echo "---| remote-iserv should have started on $PORT")
+    RISERV_PID="$!"
+    ${iserv-proxy}/bin/iserv-proxy $@ 127.0.0.1 "$PORT"
+    (>&2 echo "---> killing remote-iserv...")
     kill $RISERV_PID
   '';
+  ################################################################################
+  # Build logic (TH support via remote iserv via wine)
+  #
+  setupBuildFlags = map (opt: "--ghc-option=" + opt) [
+    "-fexternal-interpreter"
+    "-pgmi" "${wineIservWrapper}"
+    # TODO: this should be automatically injected based on the extraLibrary.
+    "-L${mingw_w64_pthreads}/lib"
+    "-L${mingw_w64_pthreads}/bin"
+    "-L${gmp}/lib"
+  ];
 
   ################################################################################
   # Test logic via wine
@@ -75,4 +76,4 @@ let
     echo "================================================================================"
   '';
 
-in { inherit preBuild postBuild preCheck postCheck setupBuildFlags setupTestFlags; }
+in { inherit preCheck postCheck setupBuildFlags setupTestFlags; }
