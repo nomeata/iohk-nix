@@ -22,6 +22,7 @@ commonLib:
 { pkgs, buildModules, config, lib, ... }:
 let
   withTH = import ./mingw_w64.nix {
+    inherit (pkgs.stdenv) hostPlatform;
     inherit (commonLib.pkgs) stdenv lib writeScriptBin;
     wine = pkgs.buildPackages.winePackages.minimal;
     inherit (pkgs.windows) mingw_w64_pthreads;
@@ -37,7 +38,7 @@ let
   } // {
     # we can perform testing of cross compiled test-suites by using wine.
     # Therfore let's enable doCrossCheck here!
-    doCrossCheck = true;
+    doCrossCheck = pkgs.stdenv.hostPlatform.isWindows;
   };
 in {
   packages = {
@@ -85,10 +86,8 @@ in {
     binary.setupBuildFlags = [];
     filepath.setupBuildFlags = [];
     time.setupBuildFlags = [];
-    unix.setupBuildFlags = [];
     Win32.setupBuildFlags = [];
     libiserv.setupBuildFlags = [];
-    iserv-proxy.setupBuildFlags = [];
     remote-iserv.setupBuildFlags = [];
     directory.setupBuildFlags = [];
     ghc-boot.setupBuildFlags = [];
@@ -96,17 +95,5 @@ in {
     ghci.setupBuildFlags = [];
     network.setupBuildFlags = [];
 
-    # These are needed to ensure that hsc2hs
-    # and happy are not build with TH support.
-    # TODO: This should never be the case as
-    # they should come from the buildPackages
-    # and the withTH logic should only be enabled
-    # when `isWindows`.  There must be some bug
-    # in there...
-    mtl.setupBuildFlags = [];
-    process.setupBuildFlags = [];
-    hsc2hs.setupBuildFlags = [];
-    happy.setupBuildFlags = [];
   };
-  } // lib.optionalAttrs nixpkgs.stdenv.hostPlatform.isWindows (withTH // {
-  })
+} // withTH

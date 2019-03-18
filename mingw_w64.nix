@@ -11,6 +11,7 @@
 # extra libraries. Their dlls are copied
 # when tests are run.
 , extra-test-libs ? []
+, hostPlatform
 }:
 let
 
@@ -34,14 +35,14 @@ let
   ################################################################################
   # Build logic (TH support via remote iserv via wine)
   #
-  setupBuildFlags = map (opt: "--ghc-option=" + opt) [
+  setupBuildFlags = map (opt: "--ghc-option=" + opt) (lib.optionals hostPlatform.isWindows [
     "-fexternal-interpreter"
     "-pgmi" "${wineIservWrapper}/bin/iserv-wrapper"
     # TODO: this should be automatically injected based on the extraLibrary.
     "-L${mingw_w64_pthreads}/lib"
     "-L${mingw_w64_pthreads}/bin"
     "-L${gmp}/lib"
-  ];
+    ]);
 
   ################################################################################
   # Test logic via wine
@@ -51,8 +52,8 @@ let
     set -euo pipefail
     WINEDLLOVERRIDES="winemac.drv=d" WINEDEBUG=-all+error LC_ALL=en_US.UTF-8 WINEPREFIX=$TMP ${wine}/bin/wine64 $@*
   '';
-  setupTestFlags = [ "--test-wrapper ${wineTestWrapper}/bin/test-wrapper" ];
-  preCheck = ''
+  setupTestFlags = lib.optionals hostPlatform.isWindows [ "--test-wrapper ${wineTestWrapper}/bin/test-wrapper" ];
+  preCheck = lib.optionalString hostPlatform.isWindows ''
     echo "================================================================================"
     echo "RUNNING TESTS for $name via wine64"
     echo "================================================================================"
@@ -70,7 +71,7 @@ let
       fi
     done
   '';
-  postCheck = ''
+  postCheck = lib.optionalString hostPlatform.isWindows ''
     echo "================================================================================"
     echo "END RUNNING TESTS"
     echo "================================================================================"
