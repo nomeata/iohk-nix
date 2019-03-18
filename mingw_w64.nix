@@ -36,7 +36,7 @@ let
   #
   setupBuildFlags = map (opt: "--ghc-option=" + opt) [
     "-fexternal-interpreter"
-    "-pgmi" "${wineIservWrapper}"
+    "-pgmi" "${wineIservWrapper}/bin/iserv-wrapper"
     # TODO: this should be automatically injected based on the extraLibrary.
     "-L${mingw_w64_pthreads}/lib"
     "-L${mingw_w64_pthreads}/bin"

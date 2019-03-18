@@ -95,6 +95,18 @@ in {
     transformers.setupBuildFlags = [];
     ghci.setupBuildFlags = [];
     network.setupBuildFlags = [];
+
+    # These are needed to ensure that hsc2hs
+    # and happy are not build with TH support.
+    # TODO: This should never be the case as
+    # they should come from the buildPackages
+    # and the withTH logic should only be enabled
+    # when `isWindows`.  There must be some bug
+    # in there...
+    mtl.setupBuildFlags = [];
+    process.setupBuildFlags = [];
+    hsc2hs.setupBuildFlags = [];
+    happy.setupBuildFlags = [];
   };
   } // lib.optionalAttrs nixpkgs.stdenv.hostPlatform.isWindows (withTH // {
   })
