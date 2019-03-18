@@ -73,5 +73,28 @@ in {
     streaming-commons.patches  = [ ./patches/streaming-commons-0.2.0.0.patch ];
     x509-system.patches        = [ ./patches/x509-system-1.6.6.patch ];
     file-embed-lzma.patches    = [ ./patches/file-embed-lzma-0.patch ];
-  } // lib.optionalAttrs nixpkgs.stdenv.hostPlatform.isWindows withTH;
-}
+
+    # Set all of these to [], as these form the
+    # dependency graph of the libiserv, iserv-proxy, and iserv-remote
+    # packages.  Subsequently we do not want the defaults that `withTH`
+    # `-fexternal-interpreter` would install here.  That would ultimately
+    # result in cyclic dependencies as it injects `remote-iserv` and
+    # `iserv-proxy` as a dependency into every package.
+    bytestring.setupBuildFlags = [];
+    containers.setupBuildFlags = [];
+    binary.setupBuildFlags = [];
+    filepath.setupBuildFlags = [];
+    time.setupBuildFlags = [];
+    unix.setupBuildFlags = [];
+    Win32.setupBuildFlags = [];
+    libiserv.setupBuildFlags = [];
+    iserv-proxy.setupBuildFlags = [];
+    remote-iserv.setupBuildFlags = [];
+    directory.setupBuildFlags = [];
+    ghc-boot.setupBuildFlags = [];
+    transformers.setupBuildFlags = [];
+    ghci.setupBuildFlags = [];
+    network.setupBuildFlags = [];
+  };
+  } // lib.optionalAttrs nixpkgs.stdenv.hostPlatform.isWindows (withTH // {
+  })
